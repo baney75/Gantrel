@@ -31,4 +31,4 @@ Gantrel links only to MIT, Apache, BSD and LGPL libraries. GPL and AGPL programs
 
 ## After v0
 
-These wants are kept, and come after the first Dev release (planned for late August 2027): RunPod offload through Fonsviva once Fonsviva has cloud providers, a phone companion (t3code already has mobile apps to start from), agent-made themes, product-design tools beyond printing, and architecture views.
+These wants are kept, and come after the first Dev release (planned for Feb 1, 2027): RunPod offload through Fonsviva once Fonsviva has cloud providers, a phone companion (t3code already has mobile apps to start from), agent-made themes, product-design tools beyond printing, and architecture views.
