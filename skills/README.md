@@ -2,11 +2,18 @@
 
 Skills are the instructions that make the models in Gantrel do their work right. They must be standardized and powerfully good: a weak or vague skill is a bug.
 
+## Two sets
+
+- `skills/maintainer/`: skills for agents that build and maintain Gantrel itself (writing features, fixing bugs, running releases, updating benchmarks).
+- `skills/runtime/`: skills the agents inside Gantrel use while helping a user.
+
+## Originality
+
+Every skill here is original work written for Gantrel. We study strong skills we already have or find, learn what makes them good, and then write our own. We don't copy them in. Credit sources that taught us something in the skill's Sources section.
+
 ## The standard
 
-Every skill is a folder in `skills/` with a `SKILL.md` file. Copy `skills/_template/` to start a new one.
-
-Each `SKILL.md` has:
+Every skill is a folder with a `SKILL.md`. Copy `_template/` in the right set to start one. Each `SKILL.md` has:
 
 1. **Frontmatter:** `name` (kebab-case, same as the folder) and `description` (one line saying exactly when to use it).
 2. **Goal:** what a finished, correct result looks like.
@@ -15,4 +22,6 @@ Each `SKILL.md` has:
 5. **Rules and checks:** hard constraints and how to verify the output before returning it.
 6. **Sources:** references the skill relies on, with links.
 
-Keep a skill focused on one job. Put long reference material in files next to `SKILL.md` and link to them.
+## Every skill is tested
+
+A skill is not merged without tests in `tests/skills/<skill-name>/` showing it produces correct results on real cases, and a benchmark run showing which models can follow it (see `BENCHMARKS.md`). If a model needs different wording to follow a skill, that goes in `models/<model>/`, not in a fork of the skill.
