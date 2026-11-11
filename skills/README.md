@@ -1,6 +1,6 @@
 # Skills
 
-Skills are the instructions that make the models in Gantrel do their work right. They must be standardized and powerfully good: a weak or vague skill is a bug.
+Skills are the instructions that make the models in Gantrel do their work right. They must be standardized, precise and tested. A weak or vague skill is a bug.
 
 ## Two sets
 

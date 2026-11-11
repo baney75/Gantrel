@@ -1,23 +1,28 @@
 # Gantrel
 
-Gantrel is an open-source 3D design studio built for local AI. It covers everything from 3D printing to product design to architecture, for hobbyists up to professionals.
+Gantrel is an open-source 3D design studio built for local AI. It starts with 3D printing and grows into product design, for hobbyists up to professionals.
 
-Think of it as precise parametric CAD (like FreeCAD), freeform modeling and rendering (like Blender), and an agent coding workspace (like t3code) combined into one extremely easy app that a local model can drive.
+Think of it as precise parametric CAD (like FreeCAD), freeform modeling and rendering (like Blender), and an agent coding workspace (like t3code) combined into one easy app that a local model can drive.
 
-## What it does
+**First version:** an agent workspace for 3D printing. A local model writes and edits parts using existing CAD libraries (build123d, CadQuery or OpenSCAD) and shows them in a 3D viewer. Product design comes next. Architecture and building design are out of scope for now.
+
+## What it will do (planned)
+
+Nothing below is built yet. See [SUPPORTED.md](SUPPORTED.md) for what works today.
+
 
 - Lets the user describe what they want and has the model design it.
-- Produces printable parts, product models, and architectural plans and buildings.
-- Takes photos from the user as reference. Hold a standard ruler up in the photo and Gantrel uses it to get real-world dimensions.
+- Produces printable parts first, then product models.
+- Takes photos from the user as reference. Hold a standard ruler up in the photo and Gantrel uses it to get real-world dimensions. They're accurate only near the ruler's plane, so the app shows its error.
 - Researches on its own with built-in search (SearXNG and more) and browser automation to find specs, standards, materials and references.
 
 ## Skills are the core
 
-Gantrel's skills are standardized and must be powerfully good. Every skill follows one strict format with clear instructions and specifics that force the model to do the work right: correct units, valid geometry, printable tolerances, buildable structures. A weak skill is a bug.
+Gantrel's skills are standardized, precise and tested. Every skill follows one strict format with clear instructions and specifics that force the model to do the work right: correct units, valid geometry and printable tolerances. A weak skill is a bug.
 
 ## Autoresearch matters
 
-Autoresearch is central to Gantrel, not an add-on. Good design depends on real information like part dimensions, material limits, building codes and existing designs. Gantrel's models are expected to research before they design and to cite what they found. Contributors should treat research quality as seriously as geometry quality.
+Autoresearch is central to Gantrel, not an add-on. Good design depends on real information like part dimensions, material limits and existing designs. Gantrel's models are expected to research before they design and to cite what they found. Contributors should treat research quality as seriously as geometry quality.
 
 ## Local first
 

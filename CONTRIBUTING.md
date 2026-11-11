@@ -22,4 +22,4 @@ Co-authored-by: Gil Rodrigues <work@gildrb.com>
 - Read `AGENTS.md` first. It applies to people as well as agents.
 - New or changed skills follow `skills/README.md` and need tests.
 - Any claim about what Gantrel can do needs a passing test (see `TESTING.md`).
-- Work on a branch, open a pull request into `main`, and keep CI green. See `RELEASES.md` for how changes reach Nightly and Stable.
+- Work on a branch, open a pull request into `main`, and keep CI green. See `RELEASES.md` for how changes reach Dev and Stable.

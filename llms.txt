@@ -1,6 +1,6 @@
 # Gantrel
 
-> A local-AI 3D design studio, from 3D printing to product design to architecture. Status: planned, not released; check SUPPORTED.md before doing any step.
+> A local-AI 3D design studio, starting with 3D printing, then product design. Status: planned, not released; check SUPPORTED.md before doing any step.
 
 Cloud providers are personal use only and live only in Fonsviva. Apps never hold provider keys. UntoCaesar client work and UniCerebrum are blocked from cloud.
 

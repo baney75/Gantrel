@@ -4,7 +4,7 @@ Instructions for AI coding agents (Claude Code, Codex, Cursor and others) workin
 
 ## What this project is
 
-A local-AI 3D design studio for hobbyists up to professionals, from 3D printing to product design to architecture. It combines precise CAD, freeform modeling and rendering, and an agent workspace in one easy app. It uses autoresearch (SearXNG, browser automation) and reference photos, including a ruler in the shot for real dimensions.
+A local-AI 3D design studio for hobbyists up to professionals, starting with 3D printing, then product design. It combines precise CAD, rendering and an agent workspace in one easy app, built on existing CAD libraries rather than a new kernel. It uses autoresearch (SearXNG, browser automation) and reference photos, including a ruler in the shot for real dimensions.
 
 ## Ground rules
 
@@ -34,7 +34,7 @@ Ask before installing anything or spending money, never print keys, and never tr
 
 ## Skills
 
-Skills live in `skills/maintainer/` (for building this project) and `skills/runtime/` (used by agents inside the app). All are original and tested; see `skills/README.md`. Load the skill that matches your task before starting, and improve it when you learn something.
+Skills live in `skills/maintainer/` (for building this project) and `skills/runtime/` (used by agents inside the app). None exist yet. Each one must be original and tested before it merges; see `skills/README.md`. Load the skill that matches your task before starting, and improve it when you learn something.
 
 ## Testing and honesty
 
@@ -42,14 +42,14 @@ Never claim the software can do something without a passing test. Follow `TESTIN
 
 ## Releases
 
-Gantrel ships on two channels, Nightly and Stable. See `RELEASES.md`. Never push directly to `stable`.
+Gantrel ships on two channels, Stable and Dev (no nightly). See `RELEASES.md`. Never push directly to `stable`.
 
 ## Repository layout
 
 - `AGENTS.md`: this file
 - `CLAUDE.md`: Claude Code entry point, points here
 - `DESIGN.md`: design system and UX rules, owned by the designer
-- `RELEASES.md`: Nightly and Stable channels
+- `RELEASES.md`: Stable and Dev channels
 - `CONTRIBUTING.md`: how to contribute, including design work and coauthorship
 - `TESTING.md`, `SUPPORTED.md`, `BENCHMARKS.md`: accuracy, honest scope and model benchmarks
 - `skills/maintainer/`, `skills/runtime/`: original, tested skills
