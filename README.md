@@ -23,6 +23,12 @@ Autoresearch is central to Gantrel, not an add-on. Good design depends on real i
 
 Gantrel runs on local models, so designs, photos and research stay on the user's machine.
 
+## Setup
+
+Gantrel runs on [Fonsviva](https://github.com/baney75/Fonsviva), the shared local compute layer. If Fonsviva is already installed, Gantrel uses it and you pick models inside the app. If not, the app installs it for you and walks you through setup. Cloud providers are set up only in Fonsviva, for personal use only.
+
+Agents setting this up for someone: start at [docs/agents.md](docs/agents.md) or [llms.txt](llms.txt). Site: https://baney75.github.io/Gantrel/
+
 ## Status
 
 Early planning. Contributions and ideas are welcome.

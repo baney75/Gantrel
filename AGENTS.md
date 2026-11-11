@@ -18,6 +18,20 @@ A local-AI 3D design studio for hobbyists up to professionals, from 3D printing 
 - **Autoresearch is essential.** Before designing, the model researches real dimensions, materials, tolerances, standards and building codes, and cites what it found. Research quality matters as much as geometry quality.
 - **Real-world correctness.** Units, tolerances and printability or buildability are checked, not assumed.
 
+## Install and setup (for agents setting this up for a person)
+
+> **Status: planned, not released.** Gantrel has no release yet, so there is nothing to install today. These steps are the target behavior. Each one becomes true only when its test in [TESTING.md](https://github.com/baney75/Gantrel/blob/main/TESTING.md) passes, and [SUPPORTED.md](https://github.com/baney75/Gantrel/blob/main/SUPPORTED.md) is the source of truth for what works now. An agent must check SUPPORTED.md first and tell the person plainly if a step isn't supported yet.
+
+Follow [docs/agents.md](docs/agents.md) ([web](https://baney75.github.io/Gantrel/agents)). In short:
+
+1. **Install:** [docs/setup/install.md](docs/setup/install.md). Check: `fonsviva status` prints `Fonsviva <version> running at http://127.0.0.1:7341`.
+2. **Connect to Fonsviva:** [docs/setup/connect-fonsviva.md](docs/setup/connect-fonsviva.md). Check: `fonsviva keys list` shows `gantrel` as `active`.
+3. **Select models:** [docs/setup/select-models.md](docs/setup/select-models.md). Check: `fonsviva models list --app gantrel` shows the chosen models with gates `pass`.
+4. **Cloud (optional, personal only):** [docs/setup/add-cloud-provider.md](docs/setup/add-cloud-provider.md). Only in Fonsviva. Ask the person first.
+5. **If anything fails:** [docs/setup/troubleshoot.md](docs/setup/troubleshoot.md) and `fonsviva doctor`.
+
+Ask before installing anything or spending money, never print keys, and never try to get around the cloud block. Machine-readable index: [llms.txt](llms.txt).
+
 ## Skills
 
 Skills live in `skills/maintainer/` (for building this project) and `skills/runtime/` (used by agents inside the app). All are original and tested; see `skills/README.md`. Load the skill that matches your task before starting, and improve it when you learn something.
