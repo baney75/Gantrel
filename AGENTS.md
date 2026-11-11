@@ -8,7 +8,7 @@ A local-AI 3D design studio for hobbyists up to professionals, from 3D printing 
 
 ## Ground rules
 
-- **Local first.** Features must work with local models on the user's own hardware. Cloud or private compute providers (for example RunPod) are optional add-ons, never required.
+- **Local first, compute via Fonsviva.** Features must work with local models on the user's own hardware. All compute, including RunPod and other cloud providers, comes via [Fonsviva](https://github.com/baney75/Fonsviva). This app never adds providers, stores provider keys or calls a cloud provider itself. It connects to Fonsviva and shows where each job ran. Cloud providers are personal use only and are set up in Fonsviva.
 - **Private and secure by default.** User data is encrypted at rest and in transit. Never log, print or send secrets or personal data.
 - **Trusted models only.** Use safe, reputable open models. Document which models a feature was tested with.
 - **Easy beats clever.** Every feature has to be usable by a non-technical person.
