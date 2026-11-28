@@ -17,7 +17,12 @@ Covers:
 from __future__ import annotations
 
 import math
+import re
 from typing import Any
+
+_CF_POLYMER_RE = re.compile(r"^(PLA|PETG|PET|PA\d*|PC|ABS|ASA|NYLON|TPU|PPA|PPS|PEEK|PEKK)CF$")
+_FUME_POLYMERS = frozenset({"ABS", "ASA", "PC", "PA", "PA6", "PA12", "PA66", "NYLON"})
+_PA_GRADE_RE = re.compile(r"^PA\d+$")
 
 
 def check_slotted_hole(
@@ -152,9 +157,21 @@ def check_slicer_rules(
         warnings.append(f"prefer gyroid or triangular infill under load (got {infill_pattern})")
 
     mat = filament.strip().upper()
-    if ("-CF" in mat or "CF" in mat.split() or mat.endswith("CF")) and not hardened_nozzle:
+    tokens = [t for t in re.split(r"[^A-Z0-9]+", mat) if t]
+    polymer_tokens = list(tokens)
+    is_cf = "CF" in tokens
+    for tok in tokens:
+        m = _CF_POLYMER_RE.match(tok)
+        if m:
+            is_cf = True
+            polymer_tokens.append(m.group(1))
+    if is_cf and not hardened_nozzle:
         errors.append(f"{filament} requires a hardened steel nozzle")
-    if any(k in mat for k in ("ABS", "ASA", "PC", "PA", "NYLON")) and not ventilation:
+    needs_vent = any(
+        tok in _FUME_POLYMERS or _PA_GRADE_RE.match(tok)
+        for tok in polymer_tokens
+    )
+    if needs_vent and not ventilation:
         errors.append(f"{filament} emits fumes and requires active filtration or external ventilation")
     if "LW-PLA" in mat:
         warnings.append("foaming LW-PLA requires temperature and flow-rate tuning")

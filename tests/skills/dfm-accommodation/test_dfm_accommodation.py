@@ -257,6 +257,76 @@ def test_check_slicer_rules():
     assert any("LW-PLA" in w for w in lw["warnings"])
 
 
+@pytest.mark.parametrize(
+    ("filament", "needs_vent"),
+    [
+        ("CF-PETG", False),
+        ("CF-PLA", False),
+        ("CF-PA", True),
+        ("PLA CF", False),
+        ("PLACF", False),
+        ("PA6-CF", True),
+        ("PA12-CF", True),
+    ],
+)
+def test_check_slicer_rules_cf_variants(filament: str, needs_vent: bool):
+    bad = dfm_verify.check_slicer_rules(
+        0.4,
+        0.2,
+        "gyroid",
+        filament=filament,
+        hardened_nozzle=False,
+        ventilation=needs_vent,
+    )
+    assert bad["ok"] is False
+    assert any("hardened steel nozzle" in e for e in bad["errors"])
+
+    good = dfm_verify.check_slicer_rules(
+        0.4,
+        0.2,
+        "gyroid",
+        filament=filament,
+        hardened_nozzle=True,
+        ventilation=needs_vent,
+    )
+    assert good["ok"] is True
+    assert good["errors"] == []
+
+
+@pytest.mark.parametrize(
+    "filament",
+    ["PCTG", "Transparent PLA", "Opaque PETG", "Pastel PLA"],
+)
+def test_check_slicer_rules_no_fume_false_positives(filament: str):
+    res = dfm_verify.check_slicer_rules(
+        0.4,
+        0.2,
+        "gyroid",
+        filament=filament,
+        hardened_nozzle=False,
+        ventilation=False,
+    )
+    assert res["ok"] is True
+    assert res["errors"] == []
+
+
+@pytest.mark.parametrize(
+    "filament",
+    ["PA6-CF", "PA12", "ABS", "ASA", "PC", "Nylon", "CF-PA"],
+)
+def test_check_slicer_rules_fume_polymers_require_ventilation(filament: str):
+    res = dfm_verify.check_slicer_rules(
+        0.4,
+        0.2,
+        "gyroid",
+        filament=filament,
+        hardened_nozzle=True,
+        ventilation=False,
+    )
+    assert res["ok"] is False
+    assert any("ventilation" in e for e in res["errors"])
+
+
 def test_check_sheet_metal_dfm():
     # Passing without feature width and with adequate feature width
     ok = dfm_verify.check_sheet_metal_dfm(2.0, 2.0, 6.0)
