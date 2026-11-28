@@ -89,14 +89,31 @@ or the limit was Gantrel's default and the person should check their printer's.
 - Never say a time or a weight the command did not print. Never round a FAIL into a pass.
 - Never contact the printer for planning. `plan` and `check` read files only.
 - Never start or resume a print. A person starts it on the printer.
+- Never bypass a refusal with `--force`.
 - Every rule the check uses has its formula and numbers in `--json` output. When the person asks
   why, quote the `formula` and `values` of that rule.
 - Only a limit the printer's maker publishes (cited in Gantrel's profile) can fail a rule or
   refuse a plan. A limit marked "Gantrel default, not a spec" was not published for that printer:
   the rule warns instead, and you tell the person what to check. Never call that a refusal.
 
+### Slicer craft quick reference
+
+| Topic | Rule |
+| --- | --- |
+| Overhangs | Gantrel warns past 45 deg from vertical across materials; OrcaSlicer defaults to 60 deg from vertical (30 deg from horizontal). |
+| Bridges | Conservative unsupported bridge limit is 5 to 10 mm (8 to 10 mm in ABS); `print-plan` warns hard past 25 mm. |
+| Layer height | Start near half the nozzle width (`0.2 mm` for `0.4 mm` nozzle; `0.3 mm` for `0.6 mm` nozzle). |
+| Infill under load | Use gyroid or triangular infill. Avoid Grid infill (self-crossing lines collide with the nozzle). |
+| Local strength | Use local slicer modifiers to add infill or walls around bolt holes only (not high global infill). |
+| Fit-test coupon | Split out a small mounting-interface test coupon (<30 min) before a multi-hour build. |
+| Counterbores | In OrcaSlicer/Creality Slicer, enable `partially bridged` or `sacrificial layer` for support-free inverted counterbores. |
+| Warping & cutouts | Use `mouse-ear` corner brims on sharp corners. Verify material-saving cutouts in slicer preview (extra perimeters can add filament and time). |
+| Filament flags | Hardened steel nozzle for CF (`PLA-CF`, `PETG-CF`, `PA-CF`); flow and temperature tuning for foaming `LW-PLA`; active filtration or external ventilation for `ABS`, `ASA`, `PC`, `PA`. |
+
 ## Sources
 
 - Filament numbers and their sources: `src/gantrel_printer/data/materials.json` in the Gantrel
   repository. Every value lists where it came from.
 - The formulas: "Planning a print" in `docs/PRINTERS.md`.
+- Travis Foss, *10 Smart 3D Printing Tips: Tolerances, Holes, and Slicer Tricks*, DigiKey Maker.io
+  (2026-05-04), citing Rahix (`rahix.de/blog/design-for-3d-printing/`) and Slant 3D.

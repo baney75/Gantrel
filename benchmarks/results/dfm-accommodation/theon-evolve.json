@@ -1,0 +1,114 @@
+{
+  "summary": {
+    "skill": "skills/runtime/dfm-accommodation/SKILL.md",
+    "date": "2026-11-28",
+    "checker": "theon/experiments/gantrel_dfm_verify.py (pure Python stdlib + math deterministic multi-process DFM verifier)",
+    "checker_selftest": "20/20 refs passed, 9/9 mutants caught",
+    "locked_heldout_sha256": "da4930312e1eb028698b0d63bcbe86e81aae70684837b81a7c4dbee4ebd38416",
+    "vet_scan_strict": "PASS (0 findings, 0 blocking)",
+    "promoted_generation": "gen-001 (LFM2.5-8B-A1B, 83 lines, 9/10 public, 9/10 heldout, 0 regressions, PARITY_REACHED)",
+    "frontier_bar": 0.85,
+    "passes_frontier_bar_on_small_local": true,
+    "track1_companion_updates": {
+      "print_plan_v2": "skills/plugin/print-plan/SKILL.md promoted at Gen 1 (119 lines, vet PASS, 5/10 public, 6/10 heldout, +20.0pp, 0 regressions on locked heldout SHA-256 799c0058e2d8680309bef2ccd6d432408a875804e08ad6f31261f824db0878d1)",
+      "parametric_cad_dfm_gen3": "skills/runtime/parametric-cad-dfm/SKILL.md surgical Gen 3 update (130 lines, vet PASS, 5/10 public, 1/10 heldout with hold_iso273_m5_flange: true, 0 regressions vs origin/main 4fc6664 on locked heldout SHA-256 d84e1ce25d0f22332728b14e2f908d90197efd7e2439cd07f5d75f6e1ead48f8)"
+    }
+  },
+  "tracks": {
+    "dfm_accommodation_lfm2p5_8b": {
+      "skill": "skills/runtime/dfm-accommodation/SKILL.md",
+      "model": "hf.co/LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M",
+      "band": "B",
+      "stop_state": "PARITY_REACHED",
+      "promoted": true,
+      "best_gen": 1,
+      "locked_heldout_sha256": "da4930312e1eb028698b0d63bcbe86e81aae70684837b81a7c4dbee4ebd38416",
+      "checker_selftest": "20/20 refs passed, 9/9 mutants caught",
+      "baseline": {"public": "1/10", "heldout": "0/10", "lines": 28},
+      "best": {
+        "gen": 1,
+        "decision": "KEEP",
+        "stop_state": "PARITY_REACHED",
+        "public": "9/10",
+        "public_pct": 90.0,
+        "heldout": "9/10",
+        "heldout_pct": 90.0,
+        "delta_pp": 90.0,
+        "regressions": 0,
+        "lines": 83,
+        "vet": "PASS"
+      },
+      "generations": [
+        {"gen": 0, "decision": "BASELINE", "lines": 28, "public": "1/10", "heldout": "0/10", "regr": 0},
+        {"gen": 1, "decision": "KEEP", "stop_state": "PARITY_REACHED", "lines": 83, "public": "9/10", "heldout": "9/10", "delta_pp": 90.0, "regr": 0, "vet": "PASS"}
+      ]
+    },
+    "dfm_accommodation_lfm3_1p7b": {
+      "skill": "skills/runtime/dfm-accommodation/SKILL.md",
+      "model": "hf.co/LiquidAI/LFM3-1.7B-GGUF:Q4_K_M",
+      "band": "C",
+      "notes": "Anti-Slop clean",
+      "best_gen": 1,
+      "locked_heldout_sha256": "da4930312e1eb028698b0d63bcbe86e81aae70684837b81a7c4dbee4ebd38416",
+      "baseline": {"public": "0/10", "heldout": "1/10"},
+      "best": {
+        "gen": 1,
+        "decision": "KEEP",
+        "public": "7/10",
+        "public_pct": 70.0,
+        "heldout": "3/10",
+        "heldout_pct": 30.0,
+        "delta_pp": 20.0,
+        "regressions": 0,
+        "lines": 83,
+        "vet": "PASS"
+      },
+      "generations": [
+        {"gen": 0, "decision": "BASELINE", "public": "0/10", "heldout": "1/10", "regr": 0},
+        {"gen": 1, "decision": "KEEP", "lines": 83, "public": "7/10", "heldout": "3/10", "delta_pp": 20.0, "regr": 0, "vet": "PASS"}
+      ]
+    },
+    "print_plan_v2_lfm2p5_8b": {
+      "skill": "skills/plugin/print-plan/SKILL.md",
+      "model": "hf.co/LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M",
+      "band": "B",
+      "promoted": true,
+      "best_gen": 1,
+      "locked_heldout_sha256": "799c0058e2d8680309bef2ccd6d432408a875804e08ad6f31261f824db0878d1",
+      "baseline": {"source": "origin/main", "public": "3/10", "heldout": "4/10", "lines": 102},
+      "best": {
+        "gen": 1,
+        "decision": "KEEP",
+        "promoted": true,
+        "public": "5/10",
+        "heldout": "6/10",
+        "delta_pp": 20.0,
+        "regressions": 0,
+        "lines": 119,
+        "vet": "PASS"
+      },
+      "generations": [
+        {"gen": 0, "decision": "BASELINE", "source": "origin/main", "lines": 102, "public": "3/10", "heldout": "4/10", "regr": 0},
+        {"gen": 1, "decision": "KEEP", "promoted": true, "lines": 119, "public": "5/10", "heldout": "6/10", "delta_pp": 20.0, "regr": 0, "vet": "PASS"},
+        {"gen": 2, "decision": "REVERT", "lines": 119, "public": "4/10", "heldout": "4/10", "delta_pp": -20.0, "regr": 3}
+      ]
+    },
+    "parametric_cad_dfm_gen3_surgical_lfm3_1p7b": {
+      "skill": "skills/runtime/parametric-cad-dfm/SKILL.md",
+      "model": "hf.co/LiquidAI/LFM3-1.7B-GGUF:Q4_K_M",
+      "band": "C",
+      "update_type": "Gen 3 surgical update",
+      "baseline_commit": "origin/main 4fc6664",
+      "locked_heldout_sha256": "d84e1ce25d0f22332728b14e2f908d90197efd7e2439cd07f5d75f6e1ead48f8",
+      "result": {
+        "gen": 3,
+        "public": "5/10",
+        "heldout": "1/10",
+        "heldout_pass_cases": {"hold_iso273_m5_flange": true},
+        "regressions_vs_origin_main": 0,
+        "lines": 130,
+        "vet": "PASS"
+      }
+    }
+  }
+}

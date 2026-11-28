@@ -1,6 +1,6 @@
 ---
 name: parametric-cad-dfm
-description: Author watertight, print-ready parametric OpenSCAD CAD geometry with verified ISO 286 and FDM-SLA clearances, ISO 273 screw holes, CNC Kitchen heat-set insert bosses, 45-degree overhangs, teardrop horizontal holes, Manifold boolean hygiene, and architectural scale wall floors. Use when designing off-catalog parts, mechanical housings, brackets, mating assemblies, or repairing non-manifold CAD geometry.
+description: Author watertight, print-ready parametric OpenSCAD CAD geometry with verified ISO 286 and FDM-SLA clearances, ISO 273 screw holes, CNC Kitchen heat-set insert bosses, slotted datum accommodation, FDM press-fit primitives, 45-degree overhangs, teardrop horizontal holes with roof offset, support-free 2-step counterbores, Manifold boolean hygiene, and architectural scale wall floors. Use when designing off-catalog parts, mechanical housings, brackets, mating assemblies, or repairing non-manifold CAD geometry.
 ---
 
 # parametric-cad-dfm
@@ -99,7 +99,7 @@ hull() {
     translate([-sx/2, -sy/2, c]) cube([sx, sy, sz - c]);
 }
 ```
-5. **45-degree teardrop horizontal hole (Y-axis starts at `y = sy/2 + eps` with `rotate([90,0,0])`; X-axis starts at `x = -sx/2 - eps` with `rotate([90,0,90])`):**
+5. **45-degree teardrop horizontal hole (Y-axis starts at `y = sy/2 + eps` with `rotate([90,0,0])`; X-axis starts at `x = -sx/2 - eps` with `rotate([90,0,90])`; 90-deg roof point for ~4 mm bores, +0.4 mm roof offset above circle for ~10 mm bores):**
 ```openscad
 $fn = 64; eps = 0.1; sx = 30; sy = 20; sz = 30; r = 4.1; zc = 15;
 module teardrop_2d(rad) {
@@ -112,6 +112,7 @@ difference() {
 ```
 6. **Architectural scale wall floor (`1:S`):** `t_model = max(t_real / S, 1.2)` mm FDM (use `1.6` mm); `max(t_real / S, 0.5)` mm SLA. Hollow shell: `difference() { translate([-sx/2,-sy/2,0]) cube([sx,sy,sz]); translate([-(sx/2-w),-(sy/2-w),floor_h]) cube([sx-2*w,sy-2*w,sz]); }`.
 7. **L-bracket with gussets:** orient on its side (`width` along Z) inside `difference() { union() { cube([L,t,w]); cube([t,L,w]); for(z0=[0,w-gt]) translate([t-eps,t-eps,z0]) linear_extrude(height=gt) polygon([[0,0],[g,0],[0,g]]); } ... }`.
+8. **Accommodation, press-fits & support-free counterbores:** use 1 round datum hole + radial outward slots (`travel = slot_length - fastener_d`); choose crush ribs (one-time), hex holes (`$fn=6`, reduced contact), or elastic grip fins (reusable) for press fits; cut inverted counterbores with a 2-step bridging recess (1 layer `0.2 mm` on long sides + 2 layers `0.4 mm` orthogonal) or use OrcaSlicer partially-bridged / sacrificial-layer; split angled mounts into modular flat-print braces and print a small interface fit-test coupon (<30 min) before multi-hour builds.
 
 ### Deterministic verification gate (Blocker = NO-SHIP)
 
@@ -120,9 +121,10 @@ Every output must pass: Manifold compile exit 0, 0 boundary edges, 0 multi-manif
 ## Sources
 
 - ISO 286 preferred limits and fits; ISO 273 metric fastener clearance holes.
+- `@amypretzel` (2026-02-19): manufacturing accommodation, clearance, and design for adjustment (`x.com/amypretzel/status/2024530666679865810`).
+- Travis Foss, *10 Smart 3D Printing Tips: Tolerances, Holes, and Slicer Tricks*, DigiKey Maker.io (2026-05-04), citing Rahix (`rahix.de/blog/design-for-3d-printing/`) and Slant 3D (`youtube.com/@Slant3D`).
 - Boston University EPIC / Formlabs White Paper: *Engineering Fit: Optimizing Design for Functional 3D Printed Assemblies* (`bu.edu/epic/files/2025/05/SLA_Tolerances.pdf`).
-- Hubs / Protolabs Network FDM Design Guide (`hubs.com/knowledge-base/how-design-parts-fdm-3d-printing/`) and Makelab 3D Printing Tolerances.
-- CNC Kitchen / Ruthex Heat-Set Threaded Insert Guidelines (`cnckitchen.com/blog/tips-and-tricks-for-heat-set-inserts`).
+- Hubs / Protolabs Network FDM Design Guide (`hubs.com/knowledge-base/how-design-parts-fdm-3d-printing/`) and CNC Kitchen / Ruthex Heat-Set Threaded Insert Guidelines (`cnckitchen.com/blog/tips-and-tricks-for-heat-set-inserts`).
 - Manifold Library (`github.com/elalish/manifold/wiki/Manifold-Library`) and OpenSCAD User Manual (`en.wikibooks.org/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language`).
 - CADSmith (`arXiv:2603.26512`), MUSE (`arXiv:2605.28579`), and CIT-CAD (`arXiv:2609.07434`).
 - Clean-room modeling and verification patterns informed by `seehiong/blender-mcp-bridge` (MIT) and `arjun988/blender-skills` (MIT).
