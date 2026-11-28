@@ -65,12 +65,15 @@ def check_kitchen_and_bath(
     errors: list[str] = []
     perimeter = None
     if triangle_legs_ft is not None:
-        perimeter = sum(triangle_legs_ft)
-        if not (13.0 - 1e-6 <= perimeter <= 26.0 + 1e-6):
-            errors.append(f"work triangle perimeter {perimeter:.2f} ft outside [13, 26] ft")
-        for i, leg in enumerate(triangle_legs_ft):
-            if not (4.0 - 1e-6 <= leg <= 9.0 + 1e-6):
-                errors.append(f"work triangle leg {i} ({leg:.2f} ft) outside [4, 9] ft")
+        if len(triangle_legs_ft) != 3:
+            errors.append(f"work triangle requires exactly 3 legs, got {len(triangle_legs_ft)}")
+        else:
+            perimeter = sum(triangle_legs_ft)
+            if not (13.0 - 1e-6 <= perimeter <= 26.0 + 1e-6):
+                errors.append(f"work triangle perimeter {perimeter:.2f} ft outside [13, 26] ft")
+            for i, leg in enumerate(triangle_legs_ft):
+                if not (4.0 - 1e-6 <= leg <= 9.0 + 1e-6):
+                    errors.append(f"work triangle leg {i} ({leg:.2f} ft) outside [4, 9] ft")
     if aisle_width_in is not None:
         min_aisle = 48.0 if multi_cook else 42.0
         if aisle_width_in + 1e-6 < min_aisle:
@@ -127,13 +130,13 @@ def check_framing_and_deflection(
         max_end_notch = joist_depth_in / 4.0
         if bored_hole_d_in is not None and bored_hole_d_in > max_hole + 1e-6:
             errors.append(f"joist bored hole {bored_hole_d_in:.3f} in > D/3 ({max_hole:.3f} in)")
-        if bored_edge_dist_in is not None and bored_edge_dist_in + 1e-6 < 2.0:
-            errors.append(f"joist hole edge distance {bored_edge_dist_in:.3f} in < 2.0 in min")
-        if notch_depth_in is not None and notch_depth_in > 0:
-            if notch_in_middle_third:
-                errors.append("zero notches permitted in middle 1/3 of joist span")
-            elif notch_depth_in > max_end_notch + 1e-6:
+        if notch_depth_in is not None and notch_depth_in > 0 and not notch_in_middle_third:
+            if notch_depth_in > max_end_notch + 1e-6:
                 errors.append(f"joist end notch {notch_depth_in:.3f} in > D/4 ({max_end_notch:.3f} in)")
+    if bored_edge_dist_in is not None and bored_edge_dist_in + 1e-6 < 2.0:
+        errors.append(f"joist hole edge distance {bored_edge_dist_in:.3f} in < 2.0 in min")
+    if notch_depth_in is not None and notch_depth_in > 0 and notch_in_middle_third:
+        errors.append("zero notches permitted in middle 1/3 of joist span")
     if bearing_stud_width_in is not None and bearing_stud_notch_in is not None:
         max_stud_notch = 0.25 * bearing_stud_width_in
         if bearing_stud_notch_in > max_stud_notch + 1e-6:

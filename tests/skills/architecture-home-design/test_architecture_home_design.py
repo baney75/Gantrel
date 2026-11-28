@@ -147,6 +147,17 @@ def test_check_kitchen_and_bath():
     assert long_leg["ok"] is False
     assert any("leg 0" in e for e in long_leg["errors"])
 
+    # Kitchen triangle must have exactly 3 legs
+    two_legs = arch_verify.check_kitchen_and_bath(triangle_legs_ft=[7.0, 7.0])
+    assert two_legs["ok"] is False
+    assert two_legs["triangle_perimeter_ft"] is None
+    assert any("3 legs" in e for e in two_legs["errors"])
+
+    four_legs = arch_verify.check_kitchen_and_bath(triangle_legs_ft=[4.5, 4.5, 4.5, 4.5])
+    assert four_legs["ok"] is False
+    assert four_legs["triangle_perimeter_ft"] is None
+    assert any("3 legs" in e for e in four_legs["errors"])
+
     # Aisles: 1-cook vs multi-cook
     assert arch_verify.check_kitchen_and_bath(aisle_width_in=40.0, multi_cook=False)["ok"] is False
     assert arch_verify.check_kitchen_and_bath(aisle_width_in=44.0, multi_cook=True)["ok"] is False
@@ -216,6 +227,20 @@ def test_check_framing_and_deflection():
     )
     assert mid_fail["ok"] is False
     assert any("middle 1/3" in e for e in mid_fail["errors"])
+
+    # Depth-independent IRC checks run even when joist_depth_in is omitted
+    edge_no_depth = arch_verify.check_framing_and_deflection(bored_edge_dist_in=1.0)
+    assert edge_no_depth["ok"] is False
+    assert edge_no_depth["max_joist_hole_in"] is None
+    assert any("edge distance" in e for e in edge_no_depth["errors"])
+
+    mid_no_depth = arch_verify.check_framing_and_deflection(
+        notch_depth_in=1.0,
+        notch_in_middle_third=True,
+    )
+    assert mid_no_depth["ok"] is False
+    assert mid_no_depth["max_joist_end_notch_in"] is None
+    assert any("middle 1/3" in e for e in mid_no_depth["errors"])
 
     # End notch > D/4
     end_fail = arch_verify.check_framing_and_deflection(
