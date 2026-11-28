@@ -8,6 +8,8 @@ import re
 import sys
 from pathlib import Path
 
+import pytest
+
 from gantrel_printer.plan import pcb_verify
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -168,3 +170,30 @@ def test_check_pcb_fab_dfm_pass_and_every_threshold_fail():
     assert res_all["ok"] is False
     assert res_all["annular_ring_mm"] == 0.10
     assert len(res_all["errors"]) == 5
+
+
+def test_ipc2221_min_trace_width_rejects_non_positive_inputs():
+    invalid_cases = [
+        dict(current_a=0.0, temp_rise_c=10.0, copper_oz=1.0),
+        dict(current_a=-1.5, temp_rise_c=10.0, copper_oz=1.0),
+        dict(current_a=1.0, temp_rise_c=0.0, copper_oz=1.0),
+        dict(current_a=1.0, temp_rise_c=-5.0, copper_oz=1.0),
+        dict(current_a=1.0, temp_rise_c=10.0, copper_oz=0.0),
+        dict(current_a=1.0, temp_rise_c=10.0, copper_oz=-2.0),
+    ]
+    for kwargs in invalid_cases:
+        with pytest.raises(ValueError):
+            pcb_verify.ipc2221_min_trace_width_mm(**kwargs)
+
+
+def test_rc_cutoff_hz_rejects_non_positive_inputs():
+    invalid_cases = [
+        (0.0, 100e-9),
+        (-1000.0, 100e-9),
+        (1000.0, 0.0),
+        (1000.0, -100e-9),
+        (0.0, 0.0),
+    ]
+    for r_ohm, c_farad in invalid_cases:
+        with pytest.raises(ValueError):
+            pcb_verify.rc_cutoff_hz(r_ohm, c_farad)

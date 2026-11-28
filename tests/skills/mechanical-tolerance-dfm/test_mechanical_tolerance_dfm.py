@@ -8,6 +8,8 @@ import re
 import sys
 from pathlib import Path
 
+import pytest
+
 from gantrel_printer.plan import mech_verify
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -273,3 +275,170 @@ def test_check_thin_cylinder_pressure_pass_and_failure_branches():
     assert res_both["ok"] is False
     assert res_both["is_thin_walled"] is False
     assert len(res_both["errors"]) == 2
+
+
+def test_check_fastener_joint_substrate_normalization_and_unknown_error():
+    d = 10.0
+    normalized_cases = [
+        ("  Steel ", 1.0),
+        ("cast-iron", 1.25),
+        ("Cast Iron", 1.25),
+        ("CAST_IRON", 1.25),
+        ("aluminium", 1.5),
+        ("  Aluminum  ", 1.5),
+        ("polymer", 2.0),
+        ("  POLYMER ", 2.0),
+        ("Plastic", 2.0),
+    ]
+    for substrate, mult in normalized_cases:
+        res = mech_verify.check_fastener_joint(
+            nominal_d_mm=d,
+            substrate=substrate,
+            engagement_mm=mult * d,
+        )
+        assert res["ok"] is True, substrate
+        assert res["min_engagement_mm"] == mult * d
+
+    for bad_substrate in ("titanium", "brass", "wood", ""):
+        with pytest.raises(ValueError, match=f"unsupported substrate: {bad_substrate!r}"):
+            mech_verify.check_fastener_joint(nominal_d_mm=d, substrate=bad_substrate)
+
+
+def test_check_rectangular_beam_bending_negative_zero_and_invalid_inputs():
+    # Negative (hogging cantilever) moment uses abs(moment_n_mm)
+    res_neg_pass = mech_verify.check_rectangular_beam_bending(
+        moment_n_mm=-50000.0,
+        width_mm=10.0,
+        height_mm=20.0,
+        yield_mpa=250.0,
+        min_sf=2.0,
+    )
+    assert res_neg_pass["ok"] is True
+    assert math.isclose(res_neg_pass["bending_stress_mpa"], 75.0, rel_tol=1e-4)
+    assert math.isclose(res_neg_pass["safety_factor"], 250.0 / 75.0, rel_tol=1e-4)
+    assert res_neg_pass["errors"] == []
+
+    res_neg_fail = mech_verify.check_rectangular_beam_bending(
+        moment_n_mm=-100000.0,
+        width_mm=10.0,
+        height_mm=20.0,
+        yield_mpa=250.0,
+        min_sf=2.0,
+    )
+    assert res_neg_fail["ok"] is False
+    assert math.isclose(res_neg_fail["bending_stress_mpa"], 150.0, rel_tol=1e-4)
+    assert len(res_neg_fail["errors"]) == 1
+
+    # Zero moment gives 0 stress and inf safety factor (no ZeroDivisionError)
+    for zero_m in (0.0, -0.0):
+        res_zero = mech_verify.check_rectangular_beam_bending(
+            moment_n_mm=zero_m,
+            width_mm=10.0,
+            height_mm=20.0,
+            yield_mpa=250.0,
+            min_sf=2.0,
+        )
+        assert res_zero["ok"] is True
+        assert res_zero["bending_stress_mpa"] == 0.0
+        assert math.isinf(res_zero["safety_factor"]) and res_zero["safety_factor"] > 0
+        assert res_zero["errors"] == []
+
+    # Guard non-positive geometry and yield
+    invalid_kwargs = [
+        dict(moment_n_mm=1000.0, width_mm=0.0, height_mm=20.0, yield_mpa=250.0),
+        dict(moment_n_mm=1000.0, width_mm=-10.0, height_mm=20.0, yield_mpa=250.0),
+        dict(moment_n_mm=1000.0, width_mm=10.0, height_mm=0.0, yield_mpa=250.0),
+        dict(moment_n_mm=1000.0, width_mm=10.0, height_mm=-20.0, yield_mpa=250.0),
+        dict(moment_n_mm=1000.0, width_mm=10.0, height_mm=20.0, yield_mpa=0.0),
+        dict(moment_n_mm=1000.0, width_mm=10.0, height_mm=20.0, yield_mpa=-250.0),
+    ]
+    for kwargs in invalid_kwargs:
+        with pytest.raises(ValueError):
+            mech_verify.check_rectangular_beam_bending(**kwargs)
+
+
+def test_check_thin_cylinder_pressure_zero_boundary_and_invalid_inputs():
+    # Zero pressure gives 0 stress and inf safety factor on thin-walled cylinder
+    res_zero = mech_verify.check_thin_cylinder_pressure(
+        pressure_mpa=0.0,
+        inner_radius_mm=100.0,
+        wall_mm=5.0,
+        yield_mpa=200.0,
+        min_sf=2.0,
+    )
+    assert res_zero["ok"] is True
+    assert res_zero["is_thin_walled"] is True
+    assert res_zero["hoop_stress_mpa"] == 0.0
+    assert res_zero["axial_stress_mpa"] == 0.0
+    assert math.isinf(res_zero["safety_factor"]) and res_zero["safety_factor"] > 0
+    assert res_zero["errors"] == []
+
+    # Zero pressure on thick-walled cylinder fails only r/t check (not SF)
+    res_zero_thick = mech_verify.check_thin_cylinder_pressure(
+        pressure_mpa=0.0,
+        inner_radius_mm=40.0,
+        wall_mm=5.0,
+        yield_mpa=200.0,
+        min_sf=2.0,
+    )
+    assert res_zero_thick["ok"] is False
+    assert res_zero_thick["is_thin_walled"] is False
+    assert math.isinf(res_zero_thick["safety_factor"])
+    assert len(res_zero_thick["errors"]) == 1
+    assert "r/t" in res_zero_thick["errors"][0]
+
+    # Exact decimal r/t = 10.0 pairs where IEEE 754 r/t is slightly below 10.0
+    for r, t in ((2.8, 0.28), (1.4, 0.14), (0.7, 0.07)):
+        res_boundary = mech_verify.check_thin_cylinder_pressure(
+            pressure_mpa=1.0,
+            inner_radius_mm=r,
+            wall_mm=t,
+            yield_mpa=200.0,
+            min_sf=2.0,
+        )
+        assert res_boundary["ok"] is True, (r, t)
+        assert res_boundary["is_thin_walled"] is True, (r, t)
+        assert res_boundary["errors"] == []
+
+    # Slightly below 10.0 still fails
+    res_below = mech_verify.check_thin_cylinder_pressure(
+        pressure_mpa=1.0,
+        inner_radius_mm=2.79,
+        wall_mm=0.28,
+        yield_mpa=200.0,
+        min_sf=2.0,
+    )
+    assert res_below["ok"] is False
+    assert res_below["is_thin_walled"] is False
+    assert len(res_below["errors"]) == 1
+    assert "r/t" in res_below["errors"][0]
+
+    # Guard non-positive geometry/yield and negative pressure
+    invalid_kwargs = [
+        dict(pressure_mpa=2.0, inner_radius_mm=0.0, wall_mm=5.0, yield_mpa=200.0),
+        dict(pressure_mpa=2.0, inner_radius_mm=-10.0, wall_mm=5.0, yield_mpa=200.0),
+        dict(pressure_mpa=2.0, inner_radius_mm=100.0, wall_mm=0.0, yield_mpa=200.0),
+        dict(pressure_mpa=2.0, inner_radius_mm=100.0, wall_mm=-5.0, yield_mpa=200.0),
+        dict(pressure_mpa=2.0, inner_radius_mm=100.0, wall_mm=5.0, yield_mpa=0.0),
+        dict(pressure_mpa=2.0, inner_radius_mm=100.0, wall_mm=5.0, yield_mpa=-200.0),
+        dict(pressure_mpa=-0.5, inner_radius_mm=100.0, wall_mm=5.0, yield_mpa=200.0),
+    ]
+    for kwargs in invalid_kwargs:
+        with pytest.raises(ValueError):
+            mech_verify.check_thin_cylinder_pressure(**kwargs)
+
+
+def test_check_tolerance_stackup_mismatched_lengths_raises():
+    mismatched_cases = [
+        ([10.0, 8.0], [0.3], [1, -1]),
+        ([10.0, 8.0], [0.3, 0.4], [1]),
+        ([10.0], [0.3, 0.4], [1, -1]),
+        ([10.0, 8.0], [0.3, 0.4, 0.1], [1, -1]),
+    ]
+    for nominals, tolerances, signs in mismatched_cases:
+        with pytest.raises(ValueError):
+            mech_verify.check_tolerance_stackup(
+                nominals_mm=nominals,
+                tolerances_mm=tolerances,
+                signs=signs,
+            )

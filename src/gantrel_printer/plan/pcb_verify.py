@@ -27,6 +27,8 @@ def ipc2221_min_trace_width_mm(
     IPC-2221: I = k * (dT^0.44) * (A_mil2^0.725), k=0.048 (external) or 0.024 (internal).
     Thickness per 1 oz copper = 1.378 mil (0.035 mm).
     """
+    if current_a <= 0 or temp_rise_c <= 0 or copper_oz <= 0:
+        raise ValueError("current_a, temp_rise_c, and copper_oz must be > 0")
     k = 0.048 if external else 0.024
     area_mil2 = (current_a / (k * (temp_rise_c ** 0.44))) ** (1.0 / 0.725)
     thickness_mil = 1.378 * copper_oz
@@ -66,6 +68,8 @@ def check_ldo_thermal(
 
 def rc_cutoff_hz(r_ohm: float, c_farad: float) -> float:
     """Compute first-order RC low-pass -3 dB cutoff frequency fc = 1 / (2*pi*R*C)."""
+    if r_ohm <= 0 or c_farad <= 0:
+        raise ValueError("r_ohm and c_farad must be > 0")
     return 1.0 / (2.0 * math.pi * r_ohm * c_farad)
 
 

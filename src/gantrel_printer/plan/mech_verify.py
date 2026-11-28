@@ -22,7 +22,9 @@ def check_tolerance_stackup(
     min_required_gap_mm: float = 0.0,
 ) -> dict[str, Any]:
     """Compute nominal gap, worst-case (WC) min/max gap, and RSS +/-3sigma gap."""
-    nom = sum(s * n for s, n in zip(signs, nominals_mm))
+    if not (len(nominals_mm) == len(tolerances_mm) == len(signs)):
+        raise ValueError("nominals_mm, tolerances_mm, and signs must have equal lengths")
+    nom = sum(s * n for s, n in zip(signs, nominals_mm, strict=True))
     wc_tol = sum(abs(t) for t in tolerances_mm)
     rss_tol = math.sqrt(sum(t * t for t in tolerances_mm))
     wc_min = nom - wc_tol
@@ -54,9 +56,18 @@ def check_fastener_joint(
     torque_nm = None
     if preload_n is not None:
         torque_nm = nut_factor_k * preload_n * (nominal_d_mm / 1000.0)
-    mult = {"steel": 1.0, "cast_iron": 1.25, "aluminum": 1.5, "aluminium": 1.5, "plastic": 2.0}.get(
-        substrate.strip().lower(), 1.5
-    )
+    substrate_multipliers = {
+        "steel": 1.0,
+        "cast_iron": 1.25,
+        "aluminum": 1.5,
+        "aluminium": 1.5,
+        "plastic": 2.0,
+        "polymer": 2.0,
+    }
+    key = substrate.strip().lower().replace("-", "_").replace(" ", "_")
+    if key not in substrate_multipliers:
+        raise ValueError(f"unsupported substrate: {substrate!r}")
+    mult = substrate_multipliers[key]
     min_eng = mult * nominal_d_mm
     if engagement_mm is not None and engagement_mm + 1e-6 < min_eng:
         errors.append(f"thread engagement {engagement_mm:.2f} mm < {min_eng:.2f} mm ({mult}x d in {substrate})")
@@ -84,10 +95,12 @@ def check_rectangular_beam_bending(
     yield_mpa: float,
     min_sf: float = 2.0,
 ) -> dict[str, Any]:
-    """Compute section modulus Z = b*h^2/6, bending stress sigma = M/Z (MPa), and safety factor."""
+    """Compute section modulus Z = b*h^2/6, bending stress sigma = |M|/Z (MPa), and safety factor."""
+    if width_mm <= 0 or height_mm <= 0 or yield_mpa <= 0:
+        raise ValueError("width_mm, height_mm, and yield_mpa must be > 0")
     z_mm3 = (width_mm * height_mm * height_mm) / 6.0
-    sigma_mpa = moment_n_mm / z_mm3
-    sf = yield_mpa / sigma_mpa
+    sigma_mpa = abs(moment_n_mm) / z_mm3
+    sf = math.inf if sigma_mpa == 0.0 else yield_mpa / sigma_mpa
     errors: list[str] = []
     if sf + 1e-6 < min_sf:
         errors.append(f"safety factor {sf:.2f} < required {min_sf:.2f}")
@@ -95,7 +108,7 @@ def check_rectangular_beam_bending(
         "ok": not errors,
         "section_modulus_mm3": round(z_mm3, 4),
         "bending_stress_mpa": round(sigma_mpa, 4),
-        "safety_factor": round(sf, 4),
+        "safety_factor": round(sf, 4) if math.isfinite(sf) else math.inf,
         "errors": errors,
     }
 
@@ -109,20 +122,25 @@ def check_thin_cylinder_pressure(
     min_sf: float = 2.0,
 ) -> dict[str, Any]:
     """Check thin-walled pressure vessel (r/t >= 10), hoop stress P*r/t, axial stress P*r/(2*t)."""
+    if inner_radius_mm <= 0 or wall_mm <= 0 or yield_mpa <= 0:
+        raise ValueError("inner_radius_mm, wall_mm, and yield_mpa must be > 0")
+    if pressure_mpa < 0:
+        raise ValueError("pressure_mpa must be >= 0")
     ratio = inner_radius_mm / wall_mm
     hoop = (pressure_mpa * inner_radius_mm) / wall_mm
     axial = hoop / 2.0
-    sf = yield_mpa / hoop
+    sf = math.inf if hoop == 0.0 else yield_mpa / hoop
+    is_thin_walled = ratio + 1e-6 >= 10.0
     errors: list[str] = []
-    if ratio < 10.0:
+    if ratio + 1e-6 < 10.0:
         errors.append(f"r/t = {ratio:.2f} < 10 (thick-walled Lame equations required)")
     if sf + 1e-6 < min_sf:
         errors.append(f"hoop safety factor {sf:.2f} < required {min_sf:.2f}")
     return {
         "ok": not errors,
-        "is_thin_walled": ratio >= 10.0,
+        "is_thin_walled": is_thin_walled,
         "hoop_stress_mpa": round(hoop, 4),
         "axial_stress_mpa": round(axial, 4),
-        "safety_factor": round(sf, 4),
+        "safety_factor": round(sf, 4) if math.isfinite(sf) else math.inf,
         "errors": errors,
     }
