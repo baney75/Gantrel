@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "skill": "skills/runtime/pcb-kicad-dfm/SKILL.md",
+    "date": "2026-11-28",
+    "checker": "theon/experiments/gantrel_pcb_checker.py + gantrel_pcb_verify.py",
+    "checker_selftest": "16/16 refs passed, 4/4 mutants caught",
+    "locked_heldout_sha256": "18b0bd7fc5b713104e1db17fa1ffe65093f07d38be5f90f3ca5635f105284056",
+    "vet_scan_strict": "PASS (0 findings, 0 blocking)",
+    "promoted_generation": "gen-001 (LFM2.5-8B-A1B, 61 lines, 0 heldout regressions, PARITY_REACHED)",
+    "frontier_bar": 0.85,
+    "passes_frontier_bar_on_band_b": true
+  },
+  "tracks": {
+    "pcb_kicad_dfm_lfm2p5_8b": {
+      "model": "hf.co/LiquidAI/LFM2.5-8B-A1B-GGUF:Q4_K_M",
+      "band": "B",
+      "stop_state": "PARITY_REACHED",
+      "best_gen": 1,
+      "baseline": {
+        "public": "5/8",
+        "public_pct": 62.5,
+        "heldout": "5/8",
+        "heldout_pct": 62.5,
+        "lines": 28
+      },
+      "best": {
+        "gen": 1,
+        "decision": "KEPT",
+        "stop_state": "PARITY_REACHED",
+        "public": "7/8",
+        "public_pct": 87.5,
+        "heldout": "7/8",
+        "heldout_pct": 87.5,
+        "delta_pp": 25.0,
+        "regressions": 0,
+        "lines": 61,
+        "vet": "PASS"
+      },
+      "generations": [
+        {"gen": 0, "decision": "BASELINE", "lines": 28, "public": "5/8", "heldout": "5/8", "regr": 0},
+        {"gen": 1, "decision": "KEPT", "stop_state": "PARITY_REACHED", "lines": 61, "public": "7/8", "heldout": "7/8", "delta_pp": 25.0, "regr": 0, "vet": "PASS"}
+      ]
+    },
+    "pcb_kicad_dfm_lfm3_1p7b": {
+      "model": "hf.co/LiquidAI/LFM3-1.7B-GGUF:Q4_K_M",
+      "band": "C",
+      "best_gen": 1,
+      "baseline": {
+        "public": "2/8",
+        "public_pct": 25.0,
+        "heldout": "2/8",
+        "heldout_pct": 25.0,
+        "lines": 28
+      },
+      "best": {
+        "gen": 1,
+        "decision": "KEPT",
+        "public": "6/8",
+        "public_pct": 75.0,
+        "heldout": "5/8",
+        "heldout_pct": 62.5,
+        "delta_pp": 37.5,
+        "regressions": 0,
+        "lines": 61,
+        "vet": "PASS"
+      },
+      "generations": [
+        {"gen": 0, "decision": "BASELINE", "lines": 28, "public": "2/8", "heldout": "2/8", "regr": 0},
+        {"gen": 1, "decision": "KEPT", "lines": 61, "public": "6/8", "heldout": "5/8", "delta_pp": 37.5, "regr": 0, "vet": "PASS"}
+      ]
+    }
+  }
+}
